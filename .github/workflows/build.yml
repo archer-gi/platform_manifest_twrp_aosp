@@ -28,7 +28,7 @@ jobs:
           mka recoveryimage
 
       - name: Upload Recovery
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: TWRP-Recovery
           path: twrp/out/target/product/reno2f/recovery.img
