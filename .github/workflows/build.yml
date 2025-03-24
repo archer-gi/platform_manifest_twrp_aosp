@@ -1,0 +1,34 @@
+name: Build TWRP for Reno 2F
+
+on: push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: |
+          sudo apt update && sudo apt install -y git ccache bc bison flex build-essential zip curl python3
+      
+      - name: Sync TWRP Source
+        run: |
+          mkdir twrp && cd twrp
+          repo init --depth=1 -u https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp.git -b twrp-12.1
+          repo sync -j4
+
+      - name: Build TWRP
+        run: |
+          cd twrp
+          export ALLOW_MISSING_DEPENDENCIES=true
+          . build/envsetup.sh
+          lunch twrp_reno2f-eng
+          mka recoveryimage
+
+      - name: Upload Recovery
+        uses: actions/upload-artifact@v3
+        with:
+          name: TWRP-Recovery
+          path: twrp/out/target/product/reno2f/recovery.img
